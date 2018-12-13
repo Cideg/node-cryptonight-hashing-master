@@ -69,7 +69,7 @@ inline size_t cn_select_memory(Algo algorithm)
         return CRYPTONIGHT_MEMORY;
 
     case CRYPTONIGHT_ASC:
-        return CRYPTONIGHT_UPX_MEMORY;
+        return CRYPTONIGHT_ASC_MEMORY;
 
     case CRYPTONIGHT_LITE:
         return CRYPTONIGHT_LITE_MEMORY;
@@ -99,7 +99,7 @@ inline uint32_t cn_select_mask(Algo algorithm)
     case CRYPTONIGHT:
         return CRYPTONIGHT_MASK;
 
-    case CRYPTONIGHT_UPX:
+    case CRYPTONIGHT_ASC:
         return CRYPTONIGHT_ASC_MASK;
 
     case CRYPTONIGHT_LITE:
