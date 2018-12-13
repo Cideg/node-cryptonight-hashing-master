@@ -363,7 +363,7 @@ NAN_METHOD(cryptonight_asc_async) {
     }
 
     Callback *callback = new Nan::Callback(info[callback_arg_num].As<v8::Function>());
-    Nan::AsyncQueueWorker(new CCryptonightHeavyAsync(callback, Buffer::Data(target), Buffer::Length(target), variant));
+    Nan::AsyncQueueWorker(new CCryptonightASCAsync(callback, Buffer::Data(target), Buffer::Length(target), variant));
 }
 
 NAN_METHOD(cryptonight_light_async) {
