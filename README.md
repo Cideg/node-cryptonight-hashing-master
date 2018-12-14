@@ -1,4 +1,3 @@
-# node-cryptonight-hashing-master
 
 node-cryptonight-hashing
 ===============
