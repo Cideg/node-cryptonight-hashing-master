@@ -444,7 +444,15 @@ inline void cryptonight_single_hash(const uint8_t *__restrict__ input, size_t si
 
     cn_explode_scratchpad<ALGO, MEM, SOFT_AES>((__m128i*) ctx[0]->state, (__m128i*) ctx[0]->memory);
     cn_explode_scratchpad<2097152, SOFT_AES, PREFETCH>((__m128i*)ctx0->hash_state, (__m128i*)ctx0->long_state); 
-    __m128i ax1; 
+     
+
+    const uint8_t* l0 = ctx[0]->memory;
+    uint64_t* h0 = reinterpret_cast<uint64_t*>(ctx[0]->state);
+
+    VARIANT1_INIT(0);
+    VARIANT2_INIT(0);
+
+     __m128i ax1; 
     uint64_t idx1; 
     uint8_t* l1 = ctx0->long_state; 
 
@@ -454,21 +462,14 @@ inline void cryptonight_single_hash(const uint8_t *__restrict__ input, size_t si
     ax1 = _mm_set_epi64x(h1[1] ^ h1[5], idx1); 
     uint64_t c1l, c1h; 
     uint64_t al1 = _mm_cvtsi128_si64(ax1); 
-    uint64_t ah1 = ((uint64_t*)&ax1)[1]; 
-    __m128i *ptr1;
+    uint64_t ah1 = ((uint64_t*)&ax1)[1];
 
-
-
-    const uint8_t* l0 = ctx[0]->memory;
-    uint64_t* h0 = reinterpret_cast<uint64_t*>(ctx[0]->state);
-
-    VARIANT1_INIT(0);
-    VARIANT2_INIT(0);
 
     uint64_t al0 = h0[0] ^ h0[4];
     uint64_t ah0 = h0[1] ^ h0[5];
     __m128i bx0 = _mm_set_epi64x(h0[3] ^ h0[7], h0[2] ^ h0[6]);
     __m128i bx1 = _mm_set_epi64x(h0[9] ^ h0[11], h0[8] ^ h0[10]);
+    __m128i *ptr1;
 
     uint64_t idx0 = al0;
 
@@ -617,15 +618,15 @@ inline void cryptonight_double_hash(const uint8_t *__restrict__ input, size_t si
 
     __m128i ax0, ax1; 
     uint64_t idx0, idx1; 
-	uint8_t* l0 = ctx0->long_state; 
-	uint8_t* l1 = ctx1->long_state; 
-	uint64_t* h0 = (uint64_t*)ctx0->hash_state; 
-	uint64_t* h1 = (uint64_t*)ctx1->hash_state; 
-	idx0 = h0[0] ^ h0[4]; 
-	idx1 = h1[0] ^ h1[4]; 
-	ax0 = _mm_set_epi64x(h0[1] ^ h0[5], idx0); 
-	ax1 = _mm_set_epi64x(h1[1] ^ h1[5], idx1); 
-	__m128i *ptr0, *ptr1;    
+    uint8_t* l0 = ctx0->long_state; 
+    uint8_t* l1 = ctx1->long_state; 
+    uint64_t* h0 = (uint64_t*)ctx0->hash_state;  
+    uint64_t* h1 = (uint64_t*)ctx1->hash_state; 
+    idx0 = h0[0] ^ h0[4];  
+    idx1 = h1[0] ^ h1[4]; 
+    ax0 = _mm_set_epi64x(h0[1] ^ h0[5], idx0); 
+    ax1 = _mm_set_epi64x(h1[1] ^ h1[5], idx1); 
+	  
 
     uint64_t al0 = h0[0] ^ h0[4];
     uint64_t al1 = h1[0] ^ h1[4];
@@ -636,6 +637,7 @@ inline void cryptonight_double_hash(const uint8_t *__restrict__ input, size_t si
     __m128i bx01 = _mm_set_epi64x(h0[9] ^ h0[11], h0[8] ^ h0[10]);
     __m128i bx10 = _mm_set_epi64x(h1[3] ^ h1[7], h1[2] ^ h1[6]);
     __m128i bx11 = _mm_set_epi64x(h1[9] ^ h1[11], h1[8] ^ h1[10]);
+    __m128i *ptr0, *ptr1;  
 
     uint64_t idx0 = al0;
     uint64_t idx1 = al1;
@@ -701,8 +703,7 @@ inline void cryptonight_double_hash(const uint8_t *__restrict__ input, size_t si
         ah0 ^= ch;
         idx0 = al0;
 
-	for(size_t i = 0; i < 0x1000; i++)
-	{
+	for(size_t i = 0; i < 0x1000; i++) {
 		__m128i c0x, c0xx, c1x, c1xx; 
 
 	if (ALGO == xmrig::CRYPTONIGHT_ASC) {
