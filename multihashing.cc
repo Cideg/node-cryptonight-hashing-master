@@ -104,11 +104,13 @@ NAN_METHOD(cryptonight_asc) {
     char output[32];
     init_ctx();
     switch (variant) {
-       case 0:  cryptonight_single_hash<xmrig::CRYPTONIGHT_ASC, SOFT_AES, xmrig::VARIANT_0>(reinterpret_cast<const uint8_t*>(Buffer::Data(target)), Buffer::Length(target), reinterpret_cast<uint8_t*>(output), &ctx);
+       case 0:  cryptonight_single_hash<xmrig::CRYPTONIGHT_ASC, SOFT_AES, xmrig::VARIANT_0   >(reinterpret_cast<const uint8_t*>(Buffer::Data(target)), Buffer::Length(target), reinterpret_cast<uint8_t*>(output), &ctx);
                 break;
-       case 1:  cryptonight_single_hash<xmrig::CRYPTONIGHT_ASC, SOFT_AES, xmrig::VARIANT_1>(reinterpret_cast<const uint8_t*>(Buffer::Data(target)), Buffer::Length(target), reinterpret_cast<uint8_t*>(output), &ctx);
+       case 1:  cryptonight_single_hash<xmrig::CRYPTONIGHT_ASC, SOFT_AES, xmrig::VARIANT_1 >(reinterpret_cast<const uint8_t*>(Buffer::Data(target)), Buffer::Length(target), reinterpret_cast<uint8_t*>(output), &ctx);
                 break;
-       default: cryptonight_single_hash<xmrig::CRYPTONIGHT_ASC, SOFT_AES, xmrig::VARIANT_1>(reinterpret_cast<const uint8_t*>(Buffer::Data(target)), Buffer::Length(target), reinterpret_cast<uint8_t*>(output), &ctx);
+       case 2:  cryptonight_single_hash<xmrig::CRYPTONIGHT_ASC, SOFT_AES, xmrig::VARIANT_2>(reinterpret_cast<const uint8_t*>(Buffer::Data(target)), Buffer::Length(target), reinterpret_cast<uint8_t*>(output), &ctx);
+                break;
+       default: cryptonight_single_hash<xmrig::CRYPTONIGHT_ASC, SOFT_AES, xmrig::VARIANT_0   >(reinterpret_cast<const uint8_t*>(Buffer::Data(target)), Buffer::Length(target), reinterpret_cast<uint8_t*>(output), &ctx);
     }
 
     v8::Local<v8::Value> returnValue = Nan::CopyBuffer(output, 32).ToLocalChecked();
