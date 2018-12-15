@@ -530,13 +530,11 @@ inline void cryptonight_single_hash(const uint8_t *__restrict__ input, size_t si
         }
         bx0 = cx;
     }
-
 	
-      
-	for(size_t i = 0; i < 0x1000; i++)  //Change to 0x100000 after Softfork (20th December){
+     for(size_t i = 0; i < 0x1000; i++)  //Change to 0x100000 after Softfork (20th December){
 	__m128i c1x, c1xx;
 	
-		if (ALGO == xmrig::CRYPTONIGHT_ASC) {
+	if (ALGO == xmrig::CRYPTONIGHT_ASC) {
             uint64_t idx1; 
             uint8_t* l1 = ctx0->long_state; 
             uint64_t[2] c, c1; 
@@ -682,7 +680,7 @@ inline void cryptonight_double_hash(const uint8_t *__restrict__ input, size_t si
         ah0 ^= ch;
         idx0 = al0;
 		
-		if (ALGO == xmrig::CRYPTONIGHT_HEAVY) {           
+	if (ALGO == xmrig::CRYPTONIGHT_HEAVY) {           
             const int64x2_t x = vld1q_s64(reinterpret_cast<const int64_t *>(&l0[idx0 & MASK]));
             const int64_t n   = vgetq_lane_s64(x, 0);
             const int32_t d   = vgetq_lane_s32(x, 2);
@@ -746,10 +744,10 @@ inline void cryptonight_double_hash(const uint8_t *__restrict__ input, size_t si
         }
         bx00 = cx0;
         bx10 = cx1;
-    }
+   	}
 
-	for(size_t i = 0; i < 0x1000; i++) {
-		__m128i c0x, c0xx, c1x, c1xx; 
+    for(size_t i = 0; i < 0x1000; i++) {
+	__m128i c0x, c0xx, c1x, c1xx; 
 		
         if (ALGO == xmrig::CRYPTONIGHT_ASC) {
             __m128i ax0, ax1; 
@@ -820,7 +818,7 @@ inline void cryptonight_double_hash(const uint8_t *__restrict__ input, size_t si
 		    idx0 = al0;
 		    idx1 = al1;            
 
-
+	}
         
 
     cn_implode_scratchpad<ALGO, MEM, SOFT_AES>((__m128i*) l0, (__m128i*) h0);
