@@ -508,11 +508,35 @@ inline void cryptonight_single_hash(const uint8_t *__restrict__ input, size_t si
 
         al0 ^= cl;
         ah0 ^= ch;
-        idx0 = al0;
+        idx0 = al0; 
+	
+		if (ALGO == xmrig::CRYPTONIGHT_HEAVY) {
+            const int64x2_t x = vld1q_s64(reinterpret_cast<const int64_t *>(&l0[idx0 & MASK]));
+            const int64_t n   = vgetq_lane_s64(x, 0);
+            const int32_t d   = vgetq_lane_s32(x, 2);
+            const int64_t q   = n / (d | 0x5);
+
+            ((int64_t*)&l0[idx0 & MASK])[0] = n ^ q;
+
+            if (VARIANT == xmrig::VARIANT_XHV) {
+                idx0 = (~d) ^ q;
+            }
+            else {
+                idx0 = d ^ q;
+            }
+        }
+        if (VARIANT == xmrig::VARIANT_2) {
+            bx1 = bx0;
+        }
+        bx0 = cx;
+    }
+
+	
       
-  for(size_t i = 0; i < 0x1000; i++)  //Change to 0x100000 after Softfork (20th December){
+	for(size_t i = 0; i < 0x1000; i++)  //Change to 0x100000 after Softfork (20th December){
 	__m128i c1x, c1xx;
-  	if (ALGO == xmrig::CRYPTONIGHT_ASC) {
+	
+		if (ALGO == xmrig::CRYPTONIGHT_ASC) {
             uint64_t idx1; 
             uint8_t* l1 = ctx0->long_state; 
             uint64_t[2] c, c1; 
@@ -523,9 +547,9 @@ inline void cryptonight_single_hash(const uint8_t *__restrict__ input, size_t si
             uint64_t al1 = _mm_cvtsi128_si64(ax1); 
             uint64_t ah1 = ((uint64_t*)&ax1)[1]; 
             __m128i *ptr1;
-           ptr1 = (__m128i *)&l1[idx1 & 0x1FFFF0]; 
-	   c1x = _mm_load_si128(ptr1); 
-	if(SOFT_AES) c1x = soft_aesenc(c1x, ax1); else c1x = _mm_aesenc_si128(c1x, ax1); 
+			ptr1 = (__m128i *)&l1[idx1 & 0x1FFFF0]; 
+			c1x = _mm_load_si128(ptr1); 
+			if(SOFT_AES) c1x = soft_aesenc(c1x, ax1); else c1x = _mm_aesenc_si128(c1x, ax1); 
 	        _mm_store_si128(R128(c), c1x);  
 	        _mm_store_si128(R128(c1), _mm_load_si128(ptr1); 
 	        ptr1 = state_index(c); 
@@ -546,26 +570,7 @@ inline void cryptonight_single_hash(const uint8_t *__restrict__ input, size_t si
 	        idx1 = al1;
     }
 
-        if (ALGO == xmrig::CRYPTONIGHT_HEAVY) {
-            const int64x2_t x = vld1q_s64(reinterpret_cast<const int64_t *>(&l0[idx0 & MASK]));
-            const int64_t n   = vgetq_lane_s64(x, 0);
-            const int32_t d   = vgetq_lane_s32(x, 2);
-            const int64_t q   = n / (d | 0x5);
-
-            ((int64_t*)&l0[idx0 & MASK])[0] = n ^ q;
-
-            if (VARIANT == xmrig::VARIANT_XHV) {
-                idx0 = (~d) ^ q;
-            }
-            else {
-                idx0 = d ^ q;
-            }
-        }
-        if (VARIANT == xmrig::VARIANT_2) {
-            bx1 = bx0;
-        }
-        bx0 = cx;
-    }
+       
 
     cn_implode_scratchpad<ALGO, MEM, SOFT_AES>((__m128i*) ctx[0]->memory, (__m128i*) ctx[0]->state);
 
@@ -676,9 +681,76 @@ inline void cryptonight_double_hash(const uint8_t *__restrict__ input, size_t si
         al0 ^= cl;
         ah0 ^= ch;
         idx0 = al0;
+		
+		if (ALGO == xmrig::CRYPTONIGHT_HEAVY) {           
+            const int64x2_t x = vld1q_s64(reinterpret_cast<const int64_t *>(&l0[idx0 & MASK]));
+            const int64_t n   = vgetq_lane_s64(x, 0);
+            const int32_t d   = vgetq_lane_s32(x, 2);
+            const int64_t q   = n / (d | 0x5);
 
-     for(size_t i = 0; i < 0x1000; i++) {
-	__m128i c0x, c0xx, c1x, c1xx; 
+            ((int64_t*)&l0[idx0 & MASK])[0] = n ^ q;
+
+            if (VARIANT == xmrig::VARIANT_XHV) {
+                idx0 = (~d) ^ q;
+            }
+            else {
+                idx0 = d ^ q;
+            }
+        }
+
+        cl = ((uint64_t*) &l1[idx1 & MASK])[0];
+        ch = ((uint64_t*) &l1[idx1 & MASK])[1];
+        if (VARIANT == xmrig::VARIANT_2) {
+            VARIANT2_INTEGER_MATH(1, cl, cx1);
+            lo = __umul128(idx1, cl, &hi);
+            VARIANT2_SHUFFLE2(l1, idx1 & MASK, ax1, bx10, bx11, hi, lo);
+        } else {
+            lo = __umul128(idx1, cl, &hi);
+        }
+
+        al1 += hi;
+        ah1 += lo;
+
+        ((uint64_t*)&l1[idx1 & MASK])[0] = al1;
+
+        if (IS_V1 && (VARIANT == xmrig::VARIANT_TUBE || VARIANT == xmrig::VARIANT_RTO)) {
+            ((uint64_t*)&l1[idx1 & MASK])[1] = ah1 ^ tweak1_2_1 ^ al1;
+        } else if (IS_V1) {
+            ((uint64_t*)&l1[idx1 & MASK])[1] = ah1 ^ tweak1_2_1;
+        } else {
+            ((uint64_t*)&l1[idx1 & MASK])[1] = ah1;
+        }
+
+        al1 ^= cl;
+        ah1 ^= ch;
+        idx1 = al1;
+
+        if (ALGO == xmrig::CRYPTONIGHT_HEAVY) {
+            const int64x2_t x = vld1q_s64(reinterpret_cast<const int64_t *>(&l1[idx1 & MASK]));
+            const int64_t n   = vgetq_lane_s64(x, 0);
+            const int32_t d   = vgetq_lane_s32(x, 2);
+            const int64_t q   = n / (d | 0x5);
+
+            ((int64_t*)&l1[idx1 & MASK])[0] = n ^ q;
+
+            if (VARIANT == xmrig::VARIANT_XHV) {
+                idx1 = (~d) ^ q;
+            }
+            else {
+                idx1 = d ^ q;
+            }
+        }
+        if (VARIANT == xmrig::VARIANT_2) {
+            bx01 = bx00;
+            bx11 = bx10;
+        }
+        bx00 = cx0;
+        bx10 = cx1;
+    }
+
+	for(size_t i = 0; i < 0x1000; i++) {
+		__m128i c0x, c0xx, c1x, c1xx; 
+		
         if (ALGO == xmrig::CRYPTONIGHT_ASC) {
             __m128i ax0, ax1; 
 	        uint64_t idx0, idx1; 
@@ -749,71 +821,7 @@ inline void cryptonight_double_hash(const uint8_t *__restrict__ input, size_t si
 		    idx1 = al1;            
 
 
-        if (ALGO == xmrig::CRYPTONIGHT_HEAVY) {           
-            const int64x2_t x = vld1q_s64(reinterpret_cast<const int64_t *>(&l0[idx0 & MASK]));
-            const int64_t n   = vgetq_lane_s64(x, 0);
-            const int32_t d   = vgetq_lane_s32(x, 2);
-            const int64_t q   = n / (d | 0x5);
-
-            ((int64_t*)&l0[idx0 & MASK])[0] = n ^ q;
-
-            if (VARIANT == xmrig::VARIANT_XHV) {
-                idx0 = (~d) ^ q;
-            }
-            else {
-                idx0 = d ^ q;
-            }
-        }
-
-        cl = ((uint64_t*) &l1[idx1 & MASK])[0];
-        ch = ((uint64_t*) &l1[idx1 & MASK])[1];
-        if (VARIANT == xmrig::VARIANT_2) {
-            VARIANT2_INTEGER_MATH(1, cl, cx1);
-            lo = __umul128(idx1, cl, &hi);
-            VARIANT2_SHUFFLE2(l1, idx1 & MASK, ax1, bx10, bx11, hi, lo);
-        } else {
-            lo = __umul128(idx1, cl, &hi);
-        }
-
-        al1 += hi;
-        ah1 += lo;
-
-        ((uint64_t*)&l1[idx1 & MASK])[0] = al1;
-
-        if (IS_V1 && (VARIANT == xmrig::VARIANT_TUBE || VARIANT == xmrig::VARIANT_RTO)) {
-            ((uint64_t*)&l1[idx1 & MASK])[1] = ah1 ^ tweak1_2_1 ^ al1;
-        } else if (IS_V1) {
-            ((uint64_t*)&l1[idx1 & MASK])[1] = ah1 ^ tweak1_2_1;
-        } else {
-            ((uint64_t*)&l1[idx1 & MASK])[1] = ah1;
-        }
-
-        al1 ^= cl;
-        ah1 ^= ch;
-        idx1 = al1;
-
-        if (ALGO == xmrig::CRYPTONIGHT_HEAVY) {
-            const int64x2_t x = vld1q_s64(reinterpret_cast<const int64_t *>(&l1[idx1 & MASK]));
-            const int64_t n   = vgetq_lane_s64(x, 0);
-            const int32_t d   = vgetq_lane_s32(x, 2);
-            const int64_t q   = n / (d | 0x5);
-
-            ((int64_t*)&l1[idx1 & MASK])[0] = n ^ q;
-
-            if (VARIANT == xmrig::VARIANT_XHV) {
-                idx1 = (~d) ^ q;
-            }
-            else {
-                idx1 = d ^ q;
-            }
-        }
-        if (VARIANT == xmrig::VARIANT_2) {
-            bx01 = bx00;
-            bx11 = bx10;
-        }
-        bx00 = cx0;
-        bx10 = cx1;
-    }
+        
 
     cn_implode_scratchpad<ALGO, MEM, SOFT_AES>((__m128i*) l0, (__m128i*) h0);
     cn_implode_scratchpad<ALGO, MEM, SOFT_AES>((__m128i*) l1, (__m128i*) h1);
