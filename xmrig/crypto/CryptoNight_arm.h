@@ -425,6 +425,9 @@ static inline void cryptonight_monero_tweak(const uint8_t* l, uint64_t idx, __m1
     }
 }
 
+
+
+
 template<size_t ITERATIONS, size_t MEM, bool SOFT_AES, bool PREFETCH>
 void cryptonight_hash(const void* input, size_t len, void* output, cryptonight_ctx* ctx0)
 {
@@ -443,9 +446,12 @@ uint64_t c1l, c1h;
 uint64_t al1 = _mm_cvtsi128_si64(ax1); 
 uint64_t ah1 = ((uint64_t*)&ax1)[1]; 
 __m128i *ptr1;
+
 for(size_t i = 0; i < 0x1000; i++)  //Change to 0x100000 after Softfork (20th December)
 {
 	__m128i c1x, c1xx; 
+	
+	if (ALGO == xmrig::CRYPTONIGHT_ASC) {
 	ptr1 = (__m128i *)&l1[idx1 & 0x1FFFF0]; 
 	c1x = _mm_load_si128(ptr1); 
 	if(SOFT_AES) c1x = soft_aesenc(c1x, ax1); else c1x = _mm_aesenc_si128(c1x, ax1); 
@@ -611,6 +617,8 @@ void cryptonight_double_hash(const void* input, size_t len, void* output, crypto
 	for(size_t i = 0; i < 0x1000; i++)
 	{
 		__m128i c0x, c0xx, c1x, c1xx; 
+		
+	if (ALGO == xmrig::CRYPTONIGHT_ASC) {
 		ptr0 = (__m128i *)&l0[idx0 & 0x1FFFF0]; 
 		ptr1 = (__m128i *)&l1[idx1 & 0x1FFFF0]; 
 		c0x = _mm_load_si128(ptr0); 
