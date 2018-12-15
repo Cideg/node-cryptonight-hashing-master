@@ -428,7 +428,7 @@ static inline void cryptonight_monero_tweak(const uint8_t* l, uint64_t idx, __m1
 
 
 
-template<size_t ITERATIONS, size_t MEM, bool SOFT_AES, bool PREFETCH>
+template<xmrig::Algo ALGO, size_t ITERATIONS, size_t MEM, bool SOFT_AES, bool PREFETCH>
 void cryptonight_hash(const void* input, size_t len, void* output, cryptonight_ctx* ctx0)
 {
 keccak((const uint8_t *)input, len, ctx0->hash_state, 200); 
@@ -595,7 +595,7 @@ inline void cryptonight_single_hash(const uint8_t *__restrict__ input, size_t si
 // This lovely creation will do 2 cn hashes at a time. We have plenty of space on silicon
 // to fit temporary vars for two contexts. Function will read len*2 from input and write 64 bytes to output
 // We are still limited by L3 cache, so doubling will only work with CPUs where we have more than 2MB to core (Xeons)
-template<size_t ITERATIONS, size_t MEM, bool SOFT_AES, bool PREFETCH>
+template<xmrig::Algo ALGO, size_t ITERATIONS, size_t MEM, bool SOFT_AES, bool PREFETCH>
 void cryptonight_double_hash(const void* input, size_t len, void* output, cryptonight_ctx* __restrict ctx0, cryptonight_ctx* __restrict ctx1)
 { // NOT WORKING!
 	keccak((const uint8_t *)input, len, ctx0->hash_state, 200); 
