@@ -112,10 +112,10 @@ NAN_METHOD(cryptonight_asc) {
 
 #if !SOFT_AES && defined(CPU_INTEL)
                 #warning Using IvyBridge assembler implementation
-                cryptonight_single_hash_asm<xmrig::CRYPTONIGHT_ASC, xmrig::VARIANT_ASC, xmrig::ASM_INTEL> (reinterpret_cast<const uint8_t*>(Buffer::Data(target)), Buffer::Length(target), reinterpret_cast<uint8_t*>(output), &ctx);
+                cryptonight_single_hash_asm<xmrig::CRYPTONIGHT_ASC, xmrig::VARIANT_0, xmrig::ASM_INTEL> (reinterpret_cast<const uint8_t*>(Buffer::Data(target)), Buffer::Length(target), reinterpret_cast<uint8_t*>(output), &ctx);
 #elif !SOFT_AES && defined(CPU_AMD)
                 #warning Using Ryzen assembler implementation
-                cryptonight_single_hash_asm<xmrig::CRYPTONIGHT_ASC, xmrig::VARIANT_ASC, xmrig::ASM_RYZEN> (reinterpret_cast<const uint8_t*>(Buffer::Data(target)), Buffer::Length(target), reinterpret_cast<uint8_t*>(output), &ctx);
+                cryptonight_single_hash_asm<xmrig::CRYPTONIGHT_ASC, xmrig::VARIANT_0, xmrig::ASM_RYZEN> (reinterpret_cast<const uint8_t*>(Buffer::Data(target)), Buffer::Length(target), reinterpret_cast<uint8_t*>(output), &ctx);
 #else
                 cryptonight_single_hash    <xmrig::CRYPTONIGHT_ASC, SOFT_AES, xmrig::VARIANT_0>         (reinterpret_cast<const uint8_t*>(Buffer::Data(target)), Buffer::Length(target), reinterpret_cast<uint8_t*>(output), &ctx);
 #endif
