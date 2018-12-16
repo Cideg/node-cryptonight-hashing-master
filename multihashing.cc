@@ -391,10 +391,11 @@ class CCryptonightAscAsync : public Nan::AsyncWorker {
 
         void Execute () {
             switch (m_variant) {
-                case 0:  cryptonight_single_hash<xmrig::CRYPTONIGHT_ASC, SOFT_AES, xmrig::VARIANT_0   >(reinterpret_cast<const uint8_t*>(m_input), m_input_len, reinterpret_cast<uint8_t*>(m_output), &m_ctx);
+                case 0:  cryptonight_single_hash<xmrig::CRYPTONIGHT_ASC, SOFT_AES, xmrig::VARIANT_0>(reinterpret_cast<const uint8_t*>(m_input), m_input_len, reinterpret_cast<uint8_t*>(m_output), &m_ctx);
                          break;
-                
-                default: cryptonight_single_hash<xmrig::CRYPTONIGHT_ASC, SOFT_AES, xmrig::VARIANT_0   >(reinterpret_cast<const uint8_t*>(m_input), m_input_len, reinterpret_cast<uint8_t*>(m_output), &m_ctx);
+                case 1:  cryptonight_single_hash<xmrig::CRYPTONIGHT_ASC, SOFT_AES, xmrig::VARIANT_1>(reinterpret_cast<const uint8_t*>(m_input), m_input_len, reinterpret_cast<uint8_t*>(m_output), &m_ctx);
+                         break;
+                default: cryptonight_single_hash<xmrig::CRYPTONIGHT_ASC, SOFT_AES, xmrig::VARIANT_0>(reinterpret_cast<const uint8_t*>(m_input), m_input_len, reinterpret_cast<uint8_t*>(m_output), &m_ctx);
             }
         }
 
